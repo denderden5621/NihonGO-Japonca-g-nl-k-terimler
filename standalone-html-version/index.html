@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NihongoTR - Japonya Seyahat & Telaffuz Rehberi (Standalone)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-jp {
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-[#F9FAFB] text-[#1A1A1A] min-h-screen flex flex-col antialiased selection:bg-red-100 selection:text-[#E63946]">
+
+  <!-- ================= TOP HEADER ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-3">
+        
+        <!-- Logo -->
+        <div onclick="switchTab('places'); selectCategory('general');" class="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer group shrink-0">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#E63946] flex items-center justify-center text-white shadow-lg shadow-red-100 group-hover:scale-105 transition-transform">
+            <span class="font-black text-lg sm:text-xl font-jp">日</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-black text-xl sm:text-2xl tracking-tighter text-[#E63946]">NIHONGO</span>
+              <span class="text-[10px] sm:text-[11px] font-black px-1.5 py-0.5 rounded-full bg-red-50 text-[#E63946] border border-red-100">STANDALONE</span>
+            </div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hidden sm:block">Seyahat & AI Telaffuz Rehberi</p>
+          </div>
+        </div>
+
+        <!-- Desktop Search Bar -->
+        <div class="flex-1 max-w-md mx-2 hidden md:block">
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input
+              id="desktop-search"
+              type="text"
+              oninput="handleSearch(this.value)"
+              placeholder="Cümle, kelime veya durum ara... (Örn: hesap, poşet, su)"
+              class="w-full pl-11 pr-4 py-2.5 bg-gray-50 hover:bg-gray-100 focus:bg-white text-sm font-semibold rounded-2xl border border-gray-200 focus:border-[#E63946]/40 focus:outline-none focus:ring-4 focus:ring-red-50 transition-all"
+            />
+          </div>
+        </div>
+
+        <!-- Desktop Nav Tabs -->
+        <div class="hidden md:flex items-center gap-2">
+          <button onclick="switchTab('places')" id="desk-tab-places" class="px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 bg-[#1A1A1A] text-white shadow-md transition-all">
+            <i data-lucide="compass" class="w-4 h-4 text-[#E63946]"></i>
+            <span>Mekanlar</span>
+          </button>
+          <button onclick="switchTab('practice')" id="desk-tab-practice" class="px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 transition-all">
+            <i data-lucide="graduation-cap" class="w-4 h-4 text-[#E63946]"></i>
+            <span>Pratik & Test</span>
+          </button>
+          <button onclick="switchTab('etiquette')" id="desk-tab-etiquette" class="px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 transition-all">
+            <i data-lucide="book-open" class="w-4 h-4 text-emerald-600"></i>
+            <span>Adap</span>
+          </button>
+          <button onclick="switchTab('favorites')" id="desk-tab-favorites" class="relative px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 transition-all">
+            <i data-lucide="bookmark" class="w-4 h-4 text-amber-500"></i>
+            <span>Favoriler</span>
+            <span id="desk-fav-count" class="hidden ml-1 bg-[#E63946] text-white text-[10px] font-black rounded-full px-1.5 py-0.5 leading-none">0</span>
+          </button>
+          <button onclick="openApiKeyModal()" class="px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition-all">
+            <i data-lucide="key" class="w-4 h-4 text-amber-600"></i>
+            <span id="api-key-badge-text">API Anahtarı</span>
+          </button>
+        </div>
+
+        <!-- Mobile Quick Actions -->
+        <div class="flex md:hidden items-center gap-2">
+          <button onclick="openApiKeyModal()" class="p-2 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold flex items-center gap-1">
+            <i data-lucide="key" class="w-3.5 h-3.5"></i>
+          </button>
+          <button onclick="openApiKeyModal()" class="px-3 py-2 rounded-xl text-xs font-black bg-[#1A1A1A] text-white flex items-center gap-1.5 shadow-xs">
+            <i data-lucide="bot" class="w-3.5 h-3.5 text-rose-400"></i>
+            <span>AI</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Mobile Search Bar -->
+      <div class="pb-3 md:hidden">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input
+            id="mobile-search"
+            type="text"
+            oninput="handleSearch(this.value)"
+            placeholder="Cümle veya durum ara... (Örn: hesap, su)"
+            class="w-full pl-10 pr-4 py-2 bg-gray-100 focus:bg-white text-xs font-semibold rounded-xl border border-transparent focus:border-[#E63946]/40 focus:outline-none focus:ring-2 focus:ring-red-100"
+          />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 pb-28 md:pb-8 space-y-6">
+    
+    <!-- BANNER: API KEY STATUS -->
+    <div id="api-key-notice" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm text-amber-900">
+      <div class="flex items-center gap-2.5">
+        <i data-lucide="sparkles" class="w-5 h-5 text-amber-600 shrink-0"></i>
+        <div>
+          <span class="font-black">Yapay Zeka (Gemini) Özellikleri:</span>
+          <span class="text-amber-800 ml-1">AI sesli telaffuz değerlendirmesi için ücretsiz Google Gemini API anahtarınızı girin. (Tüm Japonca sesli cümleler, testler ve rehberler anahtarsız da %100 çevrimdışı çalışır).</span>
+        </div>
+      </div>
+      <button onclick="openApiKeyModal()" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shrink-0 self-end sm:self-auto">
+        Anahtar Gir
+      </button>
+    </div>
+
+    <!-- VIEW 1: PLACES VIEW -->
+    <div id="view-places" class="space-y-6">
+      
+      <!-- Category Selector Carousel -->
+      <div class="flex items-center gap-2.5 overflow-x-auto custom-scrollbar pb-2 pt-1" id="category-list">
+        <!-- Categories injected dynamically -->
+      </div>
+
+      <!-- Category Header Card -->
+      <div id="category-banner" class="p-5 sm:p-6 rounded-3xl bg-white border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-2">
+            <span id="cat-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-red-100 text-red-800">Mekan</span>
+            <span id="cat-count" class="text-xs font-bold text-gray-400">0 İfade</span>
+          </div>
+          <h2 id="cat-title" class="text-xl sm:text-2xl font-black text-[#1A1A1A]">Kategori Başlığı</h2>
+          <p id="cat-desc" class="text-xs sm:text-sm text-gray-600 font-medium max-w-2xl">Açıklama</p>
+        </div>
+      </div>
+
+      <!-- Phrases Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="phrases-grid">
+        <!-- Phrases injected dynamically -->
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: PRACTICE & QUIZ VIEW -->
+    <div id="view-practice" class="hidden space-y-6">
+      <div class="p-6 rounded-3xl bg-white border border-gray-200 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-black text-[#1A1A1A]">Pratik & Bilgi Kartları</h2>
+            <p class="text-xs sm:text-sm text-gray-500 font-semibold mt-1">Bilgi kartları ile ezberleyin veya 4 şıklı test ile kendinizi sınayın.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-gray-100 p-1 rounded-2xl">
+            <button onclick="setPracticeMode('flashcard')" id="p-mode-flash" class="px-4 py-2 rounded-xl text-xs font-black bg-white text-[#1A1A1A] shadow-xs">Bilgi Kartları</button>
+            <button onclick="setPracticeMode('quiz')" id="p-mode-quiz" class="px-4 py-2 rounded-xl text-xs font-black text-gray-600 hover:text-black">Mini Test</button>
+          </div>
+        </div>
+
+        <!-- Flashcard Subview -->
+        <div id="subview-flashcard" class="py-8 flex flex-col items-center justify-center space-y-6 max-w-xl mx-auto">
+          <div id="flashcard-box" onclick="flipFlashcard()" class="w-full min-h-[260px] p-8 rounded-3xl bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 shadow-lg cursor-pointer flex flex-col items-center justify-center text-center space-y-4 transition-all hover:scale-[1.01]">
+            <span class="text-[11px] font-black px-3 py-1 rounded-full bg-red-50 text-[#E63946] border border-red-100 uppercase tracking-widest" id="fc-category">Kategori</span>
+            <div id="fc-front" class="space-y-2">
+              <h3 class="text-3xl sm:text-4xl font-black font-jp text-[#1A1A1A]" id="fc-japanese">日本語</h3>
+              <p class="text-sm font-bold text-gray-400" id="fc-romaji">Romaji</p>
+              <p class="text-xs text-[#E63946] font-semibold" id="fc-phonetic">[Okunuş]</p>
+            </div>
+            <div id="fc-back" class="hidden space-y-2">
+              <h3 class="text-2xl sm:text-3xl font-black text-[#1A1A1A]" id="fc-turkish">Türkçe Anlam</h3>
+              <p class="text-xs text-gray-500 font-medium max-w-md" id="fc-notes">Kültürel ipucu</p>
+            </div>
+            <span class="text-[11px] font-bold text-gray-400 flex items-center gap-1 pt-4">
+              <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Çevirmek için tıkla
+            </span>
+          </div>
+
+          <div class="flex items-center gap-4 w-full justify-between">
+            <button onclick="prevFlashcard()" class="px-4 py-2.5 rounded-2xl bg-gray-100 hover:bg-gray-200 text-xs font-black text-[#1A1A1A] flex items-center gap-1.5">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i> Önceki
+            </button>
+            <button onclick="playCurrentFlashcardAudio(event)" class="p-3 rounded-2xl bg-red-50 text-[#E63946] hover:bg-red-100 font-bold flex items-center gap-1.5 text-xs">
+              <i data-lucide="volume-2" class="w-4 h-4"></i> Dinle
+            </button>
+            <button onclick="nextFlashcard()" class="px-4 py-2.5 rounded-2xl bg-[#1A1A1A] hover:bg-black text-xs font-black text-white flex items-center gap-1.5">
+              Sonraki <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quiz Subview -->
+        <div id="subview-quiz" class="hidden py-8 max-w-xl mx-auto space-y-6">
+          <div class="flex items-center justify-between text-xs font-bold text-gray-400">
+            <span id="quiz-progress">Soru 1 / 10</span>
+            <span id="quiz-score" class="text-[#E63946]">Skor: 0</span>
+          </div>
+          <div class="p-6 rounded-3xl bg-gray-50 border border-gray-200 space-y-3 text-center">
+            <span class="text-[11px] font-black uppercase text-gray-400" id="quiz-cat-name">Kategori</span>
+            <h3 class="text-2xl sm:text-3xl font-black font-jp text-[#1A1A1A]" id="quiz-question">Japonca Soru</h3>
+            <p class="text-xs text-gray-400 font-bold" id="quiz-romaji">Romaji</p>
+          </div>
+          <div class="grid grid-cols-1 gap-3" id="quiz-options">
+            <!-- Quiz options injected dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW 3: ETIQUETTE VIEW -->
+    <div id="view-etiquette" class="hidden space-y-6">
+      <div class="p-6 rounded-3xl bg-white border border-gray-200 shadow-xs space-y-4">
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">Rehber & Adab</span>
+          <h2 class="text-xl sm:text-2xl font-black text-[#1A1A1A] mt-2">Japonya Seyahat ve Görgü Kuralları</h2>
+          <p class="text-xs sm:text-sm text-gray-600 font-medium">Japonya'da seyahat ederken hayat kurtaracak önemli kurallar ve adab.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2" id="etiquette-grid">
+          <!-- Etiquette injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: FAVORITES VIEW -->
+    <div id="view-favorites" class="hidden space-y-6">
+      <div class="p-6 rounded-3xl bg-white border border-gray-200 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-black text-[#1A1A1A]">Kaydedilen İfadeler</h2>
+            <p class="text-xs sm:text-sm text-gray-500 font-medium">Yıldızladığınız tüm hızlı erişim cümleleri.</p>
+          </div>
+          <button onclick="clearAllFavorites()" class="text-xs font-bold text-gray-400 hover:text-red-600">Temizle</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2" id="favorites-grid">
+          <!-- Favorites injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= MOBILE BOTTOM NAVIGATION DOCK ================= -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 py-1.5">
+    <div class="grid grid-cols-5 items-center justify-around max-w-md mx-auto">
+      <button onclick="switchTab('places')" id="mob-tab-places" class="flex flex-col items-center justify-center py-1 text-[#E63946] font-black">
+        <div class="p-1 rounded-xl bg-red-50"><i data-lucide="compass" class="w-5 h-5"></i></div>
+        <span class="text-[10px] mt-0.5">Mekanlar</span>
+      </button>
+      <button onclick="switchTab('practice')" id="mob-tab-practice" class="flex flex-col items-center justify-center py-1 text-gray-500 font-semibold">
+        <div class="p-1 rounded-xl"><i data-lucide="graduation-cap" class="w-5 h-5"></i></div>
+        <span class="text-[10px] mt-0.5">Pratik</span>
+      </button>
+      <button onclick="switchTab('etiquette')" id="mob-tab-etiquette" class="flex flex-col items-center justify-center py-1 text-gray-500 font-semibold">
+        <div class="p-1 rounded-xl"><i data-lucide="book-open" class="w-5 h-5"></i></div>
+        <span class="text-[10px] mt-0.5">Adap</span>
+      </button>
+      <button onclick="switchTab('favorites')" id="mob-tab-favorites" class="relative flex flex-col items-center justify-center py-1 text-gray-500 font-semibold">
+        <div class="p-1 rounded-xl"><i data-lucide="bookmark" class="w-5 h-5"></i></div>
+        <span class="text-[10px] mt-0.5">Favoriler</span>
+        <span id="mob-fav-count" class="hidden absolute top-1 right-2 bg-[#E63946] text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center leading-none">0</span>
+      </button>
+      <button onclick="openApiKeyModal()" class="flex flex-col items-center justify-center py-1 text-gray-900 font-bold">
+        <div class="p-1 rounded-xl bg-gray-100"><i data-lucide="bot" class="w-5 h-5 text-rose-500"></i></div>
+        <span class="text-[10px] mt-0.5">AI Koç</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================= MODAL: API KEY SETTINGS ================= -->
+  <div id="modal-api-key" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl border border-gray-100">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="p-2 rounded-xl bg-amber-50 text-amber-600"><i data-lucide="key" class="w-5 h-5"></i></div>
+          <h3 class="text-lg font-black text-[#1A1A1A]">Gemini API Anahtarı</h3>
+        </div>
+        <button onclick="closeApiKeyModal()" class="p-1.5 rounded-full hover:bg-gray-100 text-gray-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed font-medium">
+        Tek dosyalık bağımsız HTML sürümünde yapay zeka telaffuz analizi ve diyalog koçu için kendi ücretsiz Google Gemini API anahtarınızı kullanabilirsiniz. Anahtarınız yalnızca tarayıcınızın yerel hafızasında (localStorage) saklanır.
+      </p>
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-black text-gray-500 uppercase tracking-wider">API Key (AI Studio)</label>
+        <input
+          id="gemini-api-key-input"
+          type="password"
+          placeholder="AIzaSy..."
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-mono focus:border-[#E63946] focus:outline-none focus:ring-2 focus:ring-red-100"
+        />
+      </div>
+      <div class="flex items-center justify-between pt-2">
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-xs font-bold text-[#E63946] hover:underline flex items-center gap-1">
+          Ücretsiz Anahtar Al <i data-lucide="external-link" class="w-3 h-3"></i>
+        </a>
+        <div class="flex items-center gap-2">
+          <button onclick="saveApiKey()" class="px-4 py-2 rounded-xl bg-[#1A1A1A] hover:bg-black text-white text-xs font-black shadow-md">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: PRONUNCIATION / AI COACH ================= -->
+  <div id="modal-pronounce" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="p-2 rounded-xl bg-red-50 text-[#E63946]"><i data-lucide="mic" class="w-5 h-5"></i></div>
+          <div>
+            <h3 class="text-base font-black text-[#1A1A1A]">AI Telaffuz Koçu</h3>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Sesini Kaydet & Analiz Et</p>
+          </div>
+        </div>
+        <button onclick="closePronounceModal()" class="p-1.5 rounded-full hover:bg-gray-100 text-gray-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- Target Phrase Info -->
+      <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-center space-y-2">
+        <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-100 text-[#E63946] uppercase" id="modal-pr-cat">Kategori</span>
+        <h4 class="text-2xl font-black font-jp text-[#1A1A1A]" id="modal-pr-jp">日本語</h4>
+        <p class="text-sm font-bold text-gray-600" id="modal-pr-romaji">Romaji</p>
+        <p class="text-xs text-[#E63946] font-semibold" id="modal-pr-phonetic">[Okunuş]</p>
+        <p class="text-xs text-gray-500 font-medium border-t border-gray-200 pt-2" id="modal-pr-tr">Türkçe anlam</p>
+      </div>
+
+      <!-- Recording Section -->
+      <div class="p-6 rounded-2xl bg-gray-50 border border-gray-100 text-center space-y-4 flex flex-col items-center">
+        <div class="flex items-center gap-3">
+          <button id="btn-record-mic" onclick="toggleRecording()" class="w-16 h-16 rounded-full bg-[#E63946] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-all">
+            <i data-lucide="mic" class="w-7 h-7" id="mic-icon"></i>
+          </button>
+        </div>
+        <p class="text-xs font-bold text-gray-600" id="record-status-text">Mikrofona basın ve Japonca cümleyi söyleyin</p>
+        
+        <div id="audio-preview-box" class="hidden w-full space-y-2 pt-2 border-t border-gray-200">
+          <audio id="recorded-audio" controls class="w-full h-10"></audio>
+          <button onclick="analyzePronunciationWithGemini()" id="btn-ai-analyze" class="w-full py-3 rounded-xl bg-[#1A1A1A] hover:bg-black text-white text-xs font-black flex items-center justify-center gap-2 shadow-md">
+            <i data-lucide="sparkles" class="w-4 h-4 text-rose-400"></i>
+            <span>AI ile Telaffuzumu Değerlendir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Evaluation Result Container -->
+      <div id="evaluation-result-box" class="hidden p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-3">
+        <!-- Result content injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- EMBEDDED DATASET -->
+  <script>
+    const APP_DATA = {"categories":[{"id":"general","name":"Genel & Her Yerde","japaneseName":"基本・どこでも (Kihon)","iconName":"Sparkles","tagline":"Tüm seyahat boyunca hayat kurtaran temel ifadeler","description":"Selamlaşma, teşekkür, evet/hayır, tuvalet sorma, İngilizce sorma ve acil durum ifadeleri.","themeColor":{"bg":"bg-rose-50","text":"text-rose-700","border":"border-rose-200","badge":"bg-rose-100 text-rose-800","accent":"#e11d48","gradient":"from-rose-500 to-red-600"},"etiquetteTips":["Japonya'da hafifçe eğilerek selam vermek (Ojigi) derin bir saygı göstergesidir.","\"Sumimasen\" kelimesi hem \"Afedersiniz\", hem \"Özür dilerim\", hem de garsonu çağırırken kullanılır; seyahatin en önemli kelimesidir.","Sokakta yüksek sesle telefonla konuşmak veya bağırarak konuşmak hoş karşılanmaz.","İnsanları parmakla göstermek yerine tüm elinizi açarak yön gösterin."]},{"id":"konbini","name":"Konbini & Market","japaneseName":"コンビニ (7-Eleven / Lawson / FamilyMart)","iconName":"ShoppingBag","tagline":"7-Eleven, Lawson, FamilyMart kasiyer diyalogları","description":"Poşet isteme, yemek ısıtma (atatamemasu ka?), kaşık/çubuk seçimi, fiş ve ödeme kalıpları.","themeColor":{"bg":"bg-emerald-50","text":"text-emerald-700","border":"border-emerald-200","badge":"bg-emerald-100 text-emerald-800","accent":"#059669","gradient":"from-emerald-500 to-teal-600"},"etiquetteTips":["Kasiyerler sıcak bento aldığınızda ısıtmak isteyip istemediğinizi \"Atatamemasu ka?\" diye sorar.","Plastik poşetler Japonya genelinde 3 ila 5 Yen arasında ücretlidir.","Ödemeyi doğrudan kasiyerin eline vermek yerine kasanın önündeki küçük tepsiye (tsurisen tray) koyun.","Çöp kutuları genellikle sadece konbini önünde bulunur; çöplerinizi pet şişe, teneke ve yanıcı olarak ayrıştırın."]},{"id":"restaurant","name":"Restoran & Ramen & Suşi","japaneseName":"レストラン・ラーメン・寿司","iconName":"Utensils","tagline":"Sipariş verme, kaç kişi olduğunuzu söyleme, hesap isteme","description":"Masa bekleme, kişi sayısı, su isteme, alerji/domuz eti sorma, hesap ve \"Gochisousama\" adabı.","themeColor":{"bg":"bg-amber-50","text":"text-amber-700","border":"border-amber-200","badge":"bg-amber-100 text-amber-800","accent":"#d97706","gradient":"from-amber-500 to-orange-600"},"etiquetteTips":["Japonya'da ASLA bahşiş (tip) verilmez! Bahşiş bırakırsanız peşinizden paranızı düşürdünüz diye koşabilirler.","Garson çağırmak için çekinmeden \"Sumimasen!\" diyebilirsiniz, bu tamamen normaldir.","Restoranlarda soğuk veya sıcak su (o-hiya) ve ıslak mendil (o-shibori) her zaman ücretsiz ikram edilir.","Yemek çubuklarını (hashi) asla pirince dik saplamayın (cenaze adetidir) ve yiyeceği çubuktan çubuğa aktarmayın."]},{"id":"store","name":"Alışveriş & Mağaza (Tax-Free)","japaneseName":"買い物・免税 (Kaimono & Tax-Free)","iconName":"Tag","tagline":"Vergisiz alışveriş, kıyafet deneme, beden ve fiyat sorma","description":"Don Quijote, Bic Camera, Uniqlo, hediyelik eşya dükkanları ve Tax-Free (%10 vergi iadesi) işlemleri.","themeColor":{"bg":"bg-indigo-50","text":"text-indigo-700","border":"border-indigo-200","badge":"bg-indigo-100 text-indigo-800","accent":"#4f46e5","gradient":"from-indigo-500 to-blue-600"},"etiquetteTips":["5000 Yen üzeri alışverişlerde Tax-Free (%10 KDV muafiyeti) için fiziksel pasaportunuzun yanınızda olması zorunludur.","Kıyafet deneme kabinine girmeden önce ayakkabılarınızı çıkartmanız veya kadınlar için makyaj örtüsü takmanız istenebilir.","Tax-Free mühürlü paketleri Japonya sınırları içinde açmamanız gerekir (kozmetik/gıda ürünleri için)."]},{"id":"train","name":"Tren & Metro & Shinkansen","japaneseName":"電車・地下鉄・新幹線 (Densha & Shinkansen)","iconName":"Train","tagline":"Peron bulma, Suica/Pasmo kartları, bilet ve Shinkansen","description":"Metro hatları, bilet otomatları, aktarmalar, JR pass ve hızlı tren koltuk rezervasyonları.","themeColor":{"bg":"bg-sky-50","text":"text-sky-700","border":"border-sky-200","badge":"bg-sky-100 text-sky-800","accent":"#0284c7","gradient":"from-sky-500 to-cyan-600"},"etiquetteTips":["Tren ve metroda telefonla sesli konuşmak yasaktır (telefonu sessiz moda \"Manner Mode\"a alın).","Peronda beklerken yerdeki çizgileri takip ederek düzenli sırada bekleyin.","Yürüyen merdivenlerde Tokyo'da solda durulur (sağ yürüyenler içindir), Osaka'da ise sağda durulur."]},{"id":"hotel","name":"Otel & Ryokan & Konaklama","japaneseName":"ホテル・旅館 (Hoteru & Ryokan)","iconName":"Building","tagline":"Giriş/çıkış, bavul emaneti, oda servisi ve Onsen adabı","description":"Check-in, bavul bırakma, Wi-Fi bilgisi, klima/ısıtıcı ayarı ve geleneksel Ryokan kaplıca kuralları.","themeColor":{"bg":"bg-violet-50","text":"text-violet-700","border":"border-violet-200","badge":"bg-violet-100 text-violet-800","accent":"#7c3aed","gradient":"from-violet-500 to-purple-600"},"etiquetteTips":["Ryokan veya geleneksel odalara girerken ayakkabınızı giriş kısmında (Genkan) çıkarıp terlik giyin. Tatami hasırına terlikle de basılmaz (sadece çorapla basılır).","Kaplıcaya (Onsen) girmeden önce tüm vücudunuzu yıkayıp durulamanız zorunludur. Havuzu sabunlamayın veya suya mayo ile girmeyin.","Bazı Onsen'lerde dövme (tattoo) kapatıcı bant istenebilir."]},{"id":"cafe_izakaya","name":"Kafe & Çay Evi & Izakaya","japaneseName":"カフェ・居酒屋 (Kafe & Izakaya)","iconName":"Coffee","tagline":"Matcha, kahve siparişi, Izakaya atıştırmalıkları ve kadehler","description":"Sıcak/soğuk içecek seçimi (Hotto/Aisu), paket alma (Teikuauto), Izakaya kadeh kaldırma (Kanpai!).","themeColor":{"bg":"bg-orange-50","text":"text-orange-700","border":"border-orange-200","badge":"bg-orange-100 text-orange-800","accent":"#ea580c","gradient":"from-orange-500 to-amber-600"},"etiquetteTips":["Izakaya'larda masaya oturduğunuzda sipariş etmediğiniz küçük bir meze (Otoshi) gelir; bu kuver/masa ücretidir.","Kadeh tokuştururken \"Kanpai!\" (Şerefe) denir. Japonca \"Chin chin\" demeyin (farklı uygunsuz bir anlama gelir!).","Kahve siparişinde \"Hotto\" sıcak, \"Aisu\" buzlu anlamına gelir."]},{"id":"taxi_directions","name":"Taksi & Yol Tarifi","japaneseName":"タクシー・道案内 (Takushī & Michi)","iconName":"Compass","tagline":"Adres gösterme, taksi kapısı, sağ/sol ve konum sorma","description":"Taksiye binme, varış noktası söyleme, \"burada durun\", haritada yer sorma ve navigasyon.","themeColor":{"bg":"bg-yellow-50","text":"text-yellow-800","border":"border-yellow-200","badge":"bg-yellow-100 text-yellow-900","accent":"#ca8a04","gradient":"from-yellow-500 to-amber-600"},"etiquetteTips":["Japonya'da taksi arka kapıları şoför tarafından otomatik olarak açılır ve kapanır. Asla kapıyı elle açıp kapatmaya çalışmayın!","Gideceğiniz otel veya yerin Japonca adresini ya da harita işaretini telefondan göstermek her zaman en hızlı yoldur."]},{"id":"sightseeing","name":"Tapınak & Turistik Gezi","japaneseName":"観光・神社・寺 (Kankou & Jinja)","iconName":"Camera","tagline":"Tapınak adabı, fotoğraf çekme izni, bilet ve hediyeler","description":"Şinto tapınağı (Jinja) ve Budist tapınağı (Otera) ziyaretleri, fotoğraf sorma ve hatıra damgası (Goshuin).","themeColor":{"bg":"bg-teal-50","text":"text-teal-700","border":"border-teal-200","badge":"bg-teal-100 text-teal-800","accent":"#0d9488","gradient":"from-teal-500 to-emerald-600"},"etiquetteTips":["Tapınak girişindeki su çeşmesinde (Temizuya) kepçe ile sırayla sol elinizi, sağ elinizi ve ağzınızı çalkalayarak arının.","Şinto tapınağında dua ederken: 2 kez eğilin, 2 kez el çırpın, dileğinizi tutun ve 1 kez tekrar eğilin (2 Bow, 2 Claps, 1 Bow).","İç tapınak alanlarında fotoğraf çekiminin yasak olduğu tabelalara (\"Satsuei Kinshi\") dikkat edin."]},{"id":"pharmacy_emergency","name":"Eczane & Acil & Sağlık","japaneseName":"薬局・緊急 (Yakkyoku & Kinkyuu)","iconName":"ShieldAlert","tagline":"İlaç sorma, ağrı/hastalık tarif etme, polis ve acil durum","description":"Baş ağrısı, mide ilacı, alerji, kayıp eşya (Kouban polis kulübesi) ve 119 acil hatları.","themeColor":{"bg":"bg-red-50","text":"text-red-700","border":"border-red-200","badge":"bg-red-100 text-red-800","accent":"#dc2626","gradient":"from-red-500 to-rose-700"},"etiquetteTips":["Japonya'da Acil Çağrı Numaraları: Ambulans ve İtfaiye: 119, Polis: 110.","Japonya dünyanın en güvenli ülkelerindendir; kaybettiğiniz pasaport veya cüzdan çoğunlukla en yakın \"Kouban\" (Polis noktası) merkezine teslim edilir."]}],"phrases":[{"id":"gen-1","categoryId":"general","situation":"Teşekkür Ederken","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"ありがとうございます","romaji":"Arigatou gozaimasu","turkish":"Çok teşekkür ederim (Kibar)","turkishPronunciation":"Arigatoo gozay-mas","culturalNotes":"Japonya'da en çok kullanacağınız kalıptır. Hafifçe başınızı eğerek söylemek nezaketi artırır."},{"id":"gen-2","categoryId":"general","situation":"Afedersiniz / Özür Dilerim / Garson Çağırırken","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"すみません","romaji":"Sumimasen","turkish":"Afedersiniz / Özür dilerim / Bakar mısınız?","turkishPronunciation":"Sumi-masen","culturalNotes":"Yolda birinin yanından geçerken, bir şey sorarken veya restoranda garsonu çağırırken elinizi hafifçe kaldırıp \"Sumimasen!\" diyebilirsiniz."},{"id":"gen-3","categoryId":"general","situation":"Evet / Hayır","type":"phrase","speaker":"both","isEssential":true,"japanese":"はい / いいえ","romaji":"Hai / Iie","turkish":"Evet / Hayır","turkishPronunciation":"Hay / İi-ye","culturalNotes":"Japonlar doğrudan \"Iie\" (Hayır) demek yerine genellikle \"Daijoubu desu\" (Gerek yok / Sorun yok) demeyi tercih ederler."},{"id":"gen-4","categoryId":"general","situation":"Gerek Yok / Sorun Yok / İyiyim","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"大丈夫です","romaji":"Daijoubu desu","turkish":"Sorun yok / Gerek yok / İyiyim (Çok İşlevsel)","turkishPronunciation":"Day-coobu des","culturalNotes":"Poşet istemediğinizde, yardım teklifini kibarca geri çevirirken veya bir şey döküldüğünde \"Sorun yok\" demek için kullanılır."},{"id":"gen-5","categoryId":"general","situation":"İngilizce Konuşabiliyor musunuz?","type":"question","speaker":"traveler","isEssential":true,"japanese":"英語が話せますか？","romaji":"Eigo ga hanasemasu ka?","turkish":"İngilizce konuşabiliyor musunuz?","turkishPronunciation":"Ey-go ga hanase-mas ka?","culturalNotes":"Yavaş ve tane tane konuşarak sorarsanız Japonlar yardımcı olmak için büyük çaba gösterir."},{"id":"gen-6","categoryId":"general","situation":"Japoncam Pek İyi Değil","type":"phrase","speaker":"traveler","isEssential":false,"japanese":"日本語があまり話せません","romaji":"Nihongo ga amari hanasemasen","turkish":"Japoncam çok iyi değil","turkishPronunciation":"Nihon-go ga amari hanase-masen","culturalNotes":"Bunu söylediğinizde karşı taraf konuşmasını basitleştirecek veya çeviri cihazını açacaktır."},{"id":"gen-7","categoryId":"general","situation":"Fiyat Sorma","type":"question","speaker":"traveler","isEssential":true,"japanese":"これはいくらですか？","romaji":"Kore wa ikura desu ka?","turkish":"Bu ne kadar / Fiyatı nedir?","turkishPronunciation":"Kore va ikura des ka?","culturalNotes":"Bir ürünü işaret ederek doğrudan sorabilirsiniz."},{"id":"gen-8","categoryId":"general","situation":"Bunu İstiyorum / Bunu Alayım","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"これをお願いします / これをください","romaji":"Kore o onegaishimasu / Kore o kudasai","turkish":"Bunu lütfen / Bunu rica ediyorum","turkishPronunciation":"Kore o onegay-şimas / Kore o kudasay","culturalNotes":"Menüde veya vitrinde parmağınızla gösterip \"Kore o kudasai\" diyerek her şeyi sipariş edebilirsiniz."},{"id":"gen-9","categoryId":"general","situation":"Tuvalet Nerede?","type":"question","speaker":"traveler","isEssential":true,"japanese":"トイレはどこですか？","romaji":"Toire wa doko desu ka?","turkish":"Tuvalet nerede?","turkishPronunciation":"Toy-re va doko des ka?","culturalNotes":"Tren istasyonlarında, AVM'lerde ve konbini marketlerde ücretsiz ve son derece temiz tuvaletler mevcuttur."},{"id":"gen-10","categoryId":"general","situation":"Tekrar Eder misiniz?","type":"phrase","speaker":"traveler","isEssential":false,"japanese":"もう一度お願いします","romaji":"Mou ichido onegaishimasu","turkish":"Bir kez daha lütfen / Tekrar eder misiniz?","turkishPronunciation":"Moo içido onegay-şimas","culturalNotes":"Bir şeyi anlamadığınızda karşınızdakinden tekrarlamasını rica etmek için idealdir."},{"id":"gen-11","categoryId":"general","situation":"Lütfen Biraz Bekleyin","type":"phrase","speaker":"both","isEssential":false,"japanese":"ちょっと待ってください","romaji":"Chotto matte kudasai","turkish":"Lütfen bir dakika bekleyin","turkishPronunciation":"Çotto matte kudasay","culturalNotes":"Telefonunuzdan çeviriye bakarken veya cüzdanınızdan para ararken söyleyebilirsiniz."},{"id":"gen-12","categoryId":"general","situation":"Yardım Edin Lütfen!","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"助けてください！","romaji":"Tasukete kudasai!","turkish":"Lütfen yardım edin!","turkishPronunciation":"Tasukete kudasay!","culturalNotes":"Acil durumlarda çevredeki insanlardan anında yardım istemek için kullanılır."},{"id":"kon-1","categoryId":"konbini","situation":"Kasiyer: Poşet İster misiniz?","type":"dialogue","speaker":"clerk","isEssential":true,"japanese":"袋はご利用ですか？","romaji":"Fukuro wa go-riyou desu ka?","turkish":"Poşet ister misiniz?","turkishPronunciation":"Fukuro va go-riyo des ka?","clerkQuestion":{"japanese":"袋はご利用ですか？ (Fukuro wa go-riyou desu ka?)","romaji":"Fukuro wa go-riyou desu ka? / Fukuro irimasu ka?","turkish":"Poşet kullanacak mısınız / Poşet ister misiniz?","turkishPronunciation":"Fukuro va go-riyo des ka?","context":"Kasada ürünleri okuturken kasiyerin size soracağı ilk sorudur."},"recommendedResponses":[{"id":"kon-1-r1","japanese":"はい、お願いします","romaji":"Hai, onegaishimasu","turkish":"Evet, lütfen (Poşet verin)","turkishPronunciation":"Hay, onegay-şimas","notes":"Plastik poşet için 3-5 yen ekstra eklenir."},{"id":"kon-1-r2","japanese":"大丈夫です / 要りません","romaji":"Daijoubu desu / Irimasen","turkish":"Gerek yok / İstemiyorum (Kendi çantam var)","turkishPronunciation":"Day-coobu des / İri-masen","notes":"Kendi çantanız varsa elinizi hafifçe sallayarak \"Daijoubu desu\" diyebilirsiniz."}],"culturalNotes":"Japonya'da 2020'den beri plastik poşetler ücretlidir."},{"id":"kon-2","categoryId":"konbini","situation":"Kasiyer: Yemeği Isıtalım mı?","type":"dialogue","speaker":"clerk","isEssential":true,"japanese":"お弁当温めますか？","romaji":"O-bentou atatamemasu ka?","turkish":"Yemeği / Bento kutusunu ısıtalım mı?","turkishPronunciation":"O-bento atatame-mas ka?","clerkQuestion":{"japanese":"温めますか？ (Atatamemasu ka?)","romaji":"Atatamemasu ka? / O-bentou atatamemasu ka?","turkish":"Isıtalım mı?","turkishPronunciation":"Atatame-mas ka?","context":"Bento, onigiri veya hazır makarna aldığınızda kasiyer mikrodalgada ısıtmak için sorar."},"recommendedResponses":[{"id":"kon-2-r1","japanese":"はい、お願いします","romaji":"Hai, onegaishimasu","turkish":"Evet, lütfen ısıtın","turkishPronunciation":"Hay, onegay-şimas","notes":"Kasiyer arka mikrodalgada saniyeler içinde ısıtıp verir."},{"id":"kon-2-r2","japanese":"そのままで大丈夫です","romaji":"Sono mama de daijoubu desu","turkish":"Böyle iyi / Isıtmaya gerek yok","turkishPronunciation":"Sono mama de day-coobu des","notes":"Otele götürüp sonra yiyecekseniz bunu söyleyin."}]},{"id":"kon-3","categoryId":"konbini","situation":"Çubuk / Kaşık İsteme","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"お箸 / スプーンをください","romaji":"O-hashi / Supuun o kudasai","turkish":"Yemek çubuğu / Kaşık lütfen","turkishPronunciation":"O-haşi / Supuun o kudasay","recommendedResponses":[{"id":"kon-3-r1","japanese":"お箸を一本お願いします","romaji":"O-hashi o ippon onegaishimasu","turkish":"Bir çift yemek çubuğu lütfen","turkishPronunciation":"O-haşi o ippon onegay-şimas"},{"id":"kon-3-r2","japanese":"フォークをください","romaji":"Fooku o kudasai","turkish":"Çatal lütfen","turkishPronunciation":"Fooku o kudasay"}],"culturalNotes":"Çatal, kaşık ve çubuk konbini marketlerde ücretsiz olarak verilir."},{"id":"kon-4","categoryId":"konbini","situation":"Kasiyer: Puan Kartınız Var mı?","type":"dialogue","speaker":"clerk","isEssential":false,"japanese":"ポイントカードはお持ちですか？","romaji":"Pointo kaado wa o-mochi desu ka?","turkish":"Puan kartınız var mı?","turkishPronunciation":"Poynto kaado va o-moçi des ka?","clerkQuestion":{"japanese":"ポイントカードはお持ちですか？","romaji":"Pointo kaado wa o-mochi desu ka?","turkish":"Puan kartınız var mı?","turkishPronunciation":"Poynto kaado va o-moçi des ka?"},"recommendedResponses":[{"id":"kon-4-r1","japanese":"ないです / 大丈夫です","romaji":"Nai desu / Daijoubu desu","turkish":"Yok / Gerek yok","turkishPronunciation":"Nay des / Day-coobu des"}]},{"id":"kon-5","categoryId":"konbini","situation":"Ödeme Şekli Söyleme","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"カードで / Suicaでお願いします","romaji":"Kaado de / Suica de onegaishimasu","turkish":"Kredi kartıyla / Suica (ulaşım kartı) ile ödeyeceğim","turkishPronunciation":"Kaado de / Suyka de onegay-şimas","culturalNotes":"Japonya'da konbini marketlerde Suica/Pasmo ulaşım kartınızı temassız okutarak 1 saniyede ödeyebilirsiniz."},{"id":"kon-6","categoryId":"konbini","situation":"Fiş İsteme / İstememe","type":"phrase","speaker":"traveler","isEssential":false,"japanese":"レシートは大丈夫です / レシートをください","romaji":"Reshiito wa daijoubu desu / Reshiito o kudasai","turkish":"Fişe gerek yok / Fiş alabilir miyim?","turkishPronunciation":"Reşiito va day-coobu des / Reşiito o kudasay"},{"id":"res-1","categoryId":"restaurant","situation":"Garson: Kaç Kişisiniz?","type":"dialogue","speaker":"clerk","isEssential":true,"japanese":"何名様ですか？","romaji":"Nan-mei sama desu ka?","turkish":"Kaç kişisiniz?","turkishPronunciation":"Nan-mey sama des ka?","clerkQuestion":{"japanese":"何名様ですか？","romaji":"Nan-mei sama desu ka?","turkish":"Kaç kişisiniz?","turkishPronunciation":"Nan-mey sama des ka?","context":"Restorana adım attığınızda garsonun sorduğu ilk sorudur."},"recommendedResponses":[{"id":"res-1-r1","japanese":"一人です","romaji":"Hitori desu","turkish":"1 kişiyim (Tek kişiyim)","turkishPronunciation":"Hitori des","notes":"Japonya tek başına yemek yemek (Ohitorisama) için dünyanın en rahat ülkesidir."},{"id":"res-1-r2","japanese":"二人です","romaji":"Futari desu","turkish":"2 kişiyiz","turkishPronunciation":"Futari des"},{"id":"res-1-r3","japanese":"三人です / 四人です","romaji":"San-nin desu / Yon-nin desu","turkish":"3 kişiyiz / 4 kişiyiz","turkishPronunciation":"San-nin des / Yon-nin des"}]},{"id":"res-2","categoryId":"restaurant","situation":"Menü İsteme & Tavsiye Sorma","type":"question","speaker":"traveler","isEssential":true,"japanese":"おすすめは何ですか？","romaji":"O-susume wa nan desu ka?","turkish":"Tavsiyeniz / Şefin spesiyali nedir?","turkishPronunciation":"O-susume va nan des ka?","recommendedResponses":[{"id":"res-2-r1","japanese":"英語のメニューはありますか？","romaji":"Eigo no menyuu wa arimasu ka?","turkish":"İngilizce menü var mı?","turkishPronunciation":"Ey-go no menyuu va arimas ka?"}]},{"id":"res-3","categoryId":"restaurant","situation":"Adet Belirterek Sipariş Verme","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"これを一つ / 二つください","romaji":"Kore o hitotsu / futatsu kudasai","turkish":"Bundan bir tane / iki tane lütfen","turkishPronunciation":"Kore o hitotsu / futatsu kudasay","culturalNotes":"Hitotsu (1 adet), Futatsu (2 adet), Mittsu (3 adet). Parmağınızla menüdeki resmi gösterip söyleyin."},{"id":"res-4","categoryId":"restaurant","situation":"Su İsteme (Ücretsizdir)","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"お水をください","romaji":"O-mizu o kudasai","turkish":"Su rica edebilir miyim? (Buzlu su)","turkishPronunciation":"O-mizu o kudasay","culturalNotes":"Japonya'da restoranlarda su (O-mizu / O-hiya) her zaman masaya ücretsiz gelir ve bittikçe doldurulur."},{"id":"res-5","categoryId":"restaurant","situation":"Domuz Eti / Alerji Sorma (Önemli!)","type":"question","speaker":"traveler","isEssential":true,"japanese":"豚肉は入っていますか？ / 豚肉抜きでできますか？","romaji":"Butaniku wa haitteimasu ka? / Butaniku nuki de dekimasu ka?","turkish":"İçinde domuz eti var mı? / Domuz etsiz yapılabilir mi?","turkishPronunciation":"Butaniku va hayttey-mas ka? / Butaniku nuki de deki-mas ka?","culturalNotes":"Ramen çorbalarında sıklıkla domuz kemiği suyu (Tonkotsu) kullanılır. Domuz eti yemiyorsanız tavuk suyu (Tori paitan) veya vejetaryen ramen tercih edin."},{"id":"res-6","categoryId":"restaurant","situation":"Hesap İsteme","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"お会計をお願いします","romaji":"O-kaikei o onegaishimasu","turkish":"Hesap lütfen / Hesabı alabilir miyiz?","turkishPronunciation":"O-kaykey o onegay-şimas","culturalNotes":"İşaret parmaklarınızı çapraz yaparak \"X\" işareti yapmak da Japonya'da hesap istemek anlamına gelir. Masada değil, çıkıştaki kasada ödenir."},{"id":"res-7","categoryId":"restaurant","situation":"Ayrı Ayrı Ödeme Yapma","type":"phrase","speaker":"traveler","isEssential":false,"japanese":"別々でお願いします","romaji":"Betsubetsu de onegaishimasu","turkish":"Ayrı ayrı ödeyebilir miyiz?","turkishPronunciation":"Betsu-betsu de onegay-şimas"},{"id":"res-8","categoryId":"restaurant","situation":"Yemek Bittiğinde Teşekkür Etme (Adet)","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"ごちそうさまでした","romaji":"Gochisousama deshita","turkish":"Yemek için çok teşekkürler / Elinize sağlık (Çok lezzetliydi)","turkishPronunciation":"Goçisoo-sama deş-ta","culturalNotes":"Restorandan çıkarken şefe veya garsona \"Gochisousama deshita\" demek harika bir saygı ve beğeni göstergesidir."},{"id":"sto-1","categoryId":"store","situation":"Tax-Free (Vergi Muafiyeti) Sorma","type":"question","speaker":"traveler","isEssential":true,"japanese":"免税できますか？","romaji":"Menzei dekimasu ka?","turkish":"Tax-Free (Vergisiz alışveriş) yapabilir miyim?","turkishPronunciation":"Menzey deki-mas ka?","culturalNotes":"5000 Yen üzerindeki alışverişlerde %10 vergi iadesi için pasaportunuzun aslını göstermeniz gerekir."},{"id":"sto-2","categoryId":"store","situation":"Deneyebilir miyim? (Kıyafet/Ayakkabı)","type":"question","speaker":"traveler","isEssential":true,"japanese":"試着してもいいですか？","romaji":"Shichaku shitemo ii desu ka?","turkish":"Üzerimde deneyebilir miyim? / Kabine girebilir miyim?","turkishPronunciation":"Şiçaku şitemo ii des ka?","culturalNotes":"Kabinlere girmeden önce ayakkabınızı çıkartmanız gerekir."},{"id":"sto-3","categoryId":"store","situation":"Başka Beden / Renk Sorma","type":"question","speaker":"traveler","isEssential":true,"japanese":"他の色やサイズはありますか？","romaji":"Hoka no iro ya saizu wa arimasu ka?","turkish":"Başka rengi veya bedeni var mı?","turkishPronunciation":"Hoka no iro ya sayzu va arimas ka?","recommendedResponses":[{"id":"sto-3-r1","japanese":"もっと大きいサイズはありますか？","romaji":"Motto ookii saizu wa arimasu ka?","turkish":"Daha büyük bedeni var mı?","turkishPronunciation":"Motto ookii sayzu va arimas ka?"}]},{"id":"sto-4","categoryId":"store","situation":"Sadece Bakıyorum (Görevli Geldiğinde)","type":"phrase","speaker":"traveler","isEssential":false,"japanese":"見ているだけです、ありがとうございます","romaji":"Miteru dake desu, arigatou gozaimasu","turkish":"Sadece bakıyorum, teşekkürler","turkishPronunciation":"Miteru dake des, arigatoo gozay-mas"},{"id":"sto-5","categoryId":"store","situation":"Hediye Paketi İsteme","type":"phrase","speaker":"traveler","isEssential":false,"japanese":"プレゼント用に包んでいただけますか？","romaji":"Purezento you ni tsutsunde itadakemasu ka?","turkish":"Hediye paketi yapabilir misiniz?","turkishPronunciation":"Purezento yoo ni tsutsunde itadake-mas ka?","culturalNotes":"Japonya'da hediyelik eşya paketleme bir sanat derecesinde özenle ve ücretsiz yapılır."},{"id":"trn-1","categoryId":"train","situation":"Bu Tren ... İstasyonuna Gider mi?","type":"question","speaker":"traveler","isEssential":true,"japanese":"この電車は新宿に行きますか？","romaji":"Kono densha wa Shinjuku ni ikimasu ka?","turkish":"Bu tren Shinjuku'ya (hedef istasyona) gider mi?","turkishPronunciation":"Kono denşa va Şincuku ni iki-mas ka?","culturalNotes":"Shinjuku yerine gitmek istediğiniz istasyonun adını söyleyin (Örn: Shibuya, Tokyo, Kyoto)."},{"id":"trn-2","categoryId":"train","situation":"Hangi Perondan Kalkıyor?","type":"question","speaker":"traveler","isEssential":true,"japanese":"何番線ですか？","romaji":"Nan-ban sen desu ka?","turkish":"Hangi peron / Kaç numaralı hat?","turkishPronunciation":"Nan-ban sen des ka?"},{"id":"trn-3","categoryId":"train","situation":"Shinkansen (Hızlı Tren) Bileti İsteme","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"京都までの新幹線チケットを一枚お願いします","romaji":"Kyoto made no Shinkansen chiketto o ichimai onegaishimasu","turkish":"Kyoto'ya 1 adet Shinkansen hızlı tren bileti lütfen","turkishPronunciation":"Kyooto made no Şinkansen çiketto o içimay onegay-şimas","recommendedResponses":[{"id":"trn-3-r1","japanese":"指定席をお願いします","romaji":"Shiteiseki o onegaishimasu","turkish":"Numaralı / Rezerve koltuk istiyorum","turkishPronunciation":"Şitey-seki o onegay-şimas"},{"id":"trn-3-r2","japanese":"自由席で大丈夫です","romaji":"Jiyuuseki de daijoubu desu","turkish":"Serbest (rezervasyonsuz) koltuk olsun","turkishPronunciation":"Ciyuu-seki de day-coobu des"}]},{"id":"trn-4","categoryId":"train","situation":"Suica / Pasmo Kartına Bakiye Yükleme","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"Suicaにチャージしたいです","romaji":"Suica ni chaaji shitai desu","turkish":"Suica kartıma para yüklemek istiyorum","turkishPronunciation":"Suyka ni çaa-ci şitay des","culturalNotes":"Bilet makinelerinde \"English\" butonuna basarak nakit parayla kolayca bakiye yükleyebilirsiniz."},{"id":"htl-1","categoryId":"hotel","situation":"Giriş Yapma (Check-in)","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"チェックインをお願いします。予約名は〜です。","romaji":"Chekku-in o onegaishimasu. Yoyakumei wa ... desu.","turkish":"Giriş yapmak istiyorum. Rezervasyon adım ...","turkishPronunciation":"Çekku-in o onegay-şimas. Yoyaku-mey va ... des."},{"id":"htl-2","categoryId":"hotel","situation":"Bavulları Emanete Bırakabilir miyim?","type":"question","speaker":"traveler","isEssential":true,"japanese":"荷物をチェックインまで預かっていただけますか？","romaji":"Nimotsu o chekku-in made azukatte itadakemasu ka?","turkish":"Giriş saatine kadar bavullarımı emanete bırakabilir miyim?","turkishPronunciation":"Nimotsu o çekku-in made azukatte itadake-mas ka?","culturalNotes":"Otel odanız henüz hazır değilse bavullarınızı ücretsiz ve güvenle resepsiyona bırakıp şehri gezebilirsiniz."},{"id":"htl-3","categoryId":"hotel","situation":"Wi-Fi Şifresi Nedir?","type":"question","speaker":"traveler","isEssential":true,"japanese":"Wi-Fiのパスワードを教えていただけますか？","romaji":"Waifai no pasuwaado o oshiete itadakemasu ka?","turkish":"Wi-Fi şifresini öğrenebilir miyim?","turkishPronunciation":"Vay-fay no pasuvaado o oşiete itadake-mas ka?"},{"id":"htl-4","categoryId":"hotel","situation":"Çıkış Saati Kaçta?","type":"question","speaker":"traveler","isEssential":false,"japanese":"チェックアウトは何時ですか？","romaji":"Chekku-auto wa nan-ji desu ka?","turkish":"Çıkış (Check-out) saati kaçta?","turkishPronunciation":"Çekku-awto va nan-ci des ka?"},{"id":"caf-1","categoryId":"cafe_izakaya","situation":"Sıcak / Buzlu Kahve Siparişi","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"アイスラテ / ホットコーヒーを一つください","romaji":"Aisu rate / Hotto koohii o hitotsu kudasai","turkish":"Bir buzlu latte / sıcak kahve lütfen","turkishPronunciation":"Aysu rate / Hotto koohii o hitotsu kudasay","culturalNotes":"Japonya'da soğuk içeceklere \"Aisu\", sıcak içeceklere \"Hotto\" denir."},{"id":"caf-2","categoryId":"cafe_izakaya","situation":"Paket İsteme (Al-Götür)","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"テイクアウトでお願いします","romaji":"Teikuauto de onegaishimasu","turkish":"Paket / Al-götür (Take-out) olsun lütfen","turkishPronunciation":"Teyku-awto de onegay-şimas","clerkQuestion":{"japanese":"店内でお召し上がりですか？ (Tennai de o-meshagari desu ka?)","romaji":"Tennai de o-meshagari desu ka? / O-mochikaeri desu ka?","turkish":"Burada mı içeceksiniz, yoksa paket mi?","turkishPronunciation":"Tennay de o-meşagari des ka?"},"recommendedResponses":[{"id":"caf-2-r1","japanese":"ここで飲みます","romaji":"Koko de nomimasu / Tennai de","turkish":"Burada içeceğim","turkishPronunciation":"Koko de nomi-mas"},{"id":"caf-2-r2","japanese":"テイクアウトで","romaji":"Teikuauto de","turkish":"Paket olsun","turkishPronunciation":"Teyku-awto de"}]},{"id":"caf-3","categoryId":"cafe_izakaya","situation":"Izakaya'da Kadeh Kaldırma","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"乾杯！（かんぱい）","romaji":"Kanpai!","turkish":"Şerefe! / Sağlığınıza!","turkishPronunciation":"Kan-pay!","culturalNotes":"Japonya'da kadeh kaldırırken asla \"Chin chin\" demeyin (uygunsuz bir çocukça anlama gelir); daima \"Kanpai!\" deyin."},{"id":"tax-1","categoryId":"taxi_directions","situation":"Taksiye Adres Söyleme","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"この場所までお願いします","romaji":"Kono basho made onegaishimasu","turkish":"Lütfen bu adrese / buraya gidin (Haritayı göstererek)","turkishPronunciation":"Kono başo made onegay-şimas","culturalNotes":"Taksi şoförüne telefonunuzdaki harita pinini gösterip bu cümleyi söyleyin."},{"id":"tax-2","categoryId":"taxi_directions","situation":"Burada Durabilir misiniz?","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"ここで止めてください","romaji":"Koko de tomete kudasai","turkish":"Burada durabilir misiniz / Burada ineyim","turkishPronunciation":"Koko de tomete kudasay","culturalNotes":"Kapıyı kendiniz açmaya çalışmayın; şoför düğmeyle açacaktır."},{"id":"tax-3","categoryId":"taxi_directions","situation":"İstasyon / Konum Nerede?","type":"question","speaker":"traveler","isEssential":true,"japanese":"駅はどちらですか？ / まっすぐですか？","romaji":"Eki wa dochira desu ka? / Massugu desu ka?","turkish":"İstasyon ne tarafta? / Düz mü gideyim?","turkishPronunciation":"Eki va doçira des ka? / Mas-sugu des ka?"},{"id":"sgh-1","categoryId":"sightseeing","situation":"Fotoğraf Çekebilir miyim?","type":"question","speaker":"traveler","isEssential":true,"japanese":"ここで写真を撮ってもいいですか？","romaji":"Koko de shashin o totte mo ii desu ka?","turkish":"Burada fotoğraf çekebilir miyim?","turkishPronunciation":"Koko de şaşin o totte mo ii des ka?","culturalNotes":"Bazı tapınak içlerinde ve kutsal heykellerin önünde fotoğraf çekmek yasaktır; sormak çok nazik bir davranıştır."},{"id":"sgh-2","categoryId":"sightseeing","situation":"Fotoğrafımızı Çeker misiniz?","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"写真を撮っていただけますか？","romaji":"Shashin o totte itadakemasu ka?","turkish":"Bizim fotoğrafımızı çekebilir misiniz?","turkishPronunciation":"Şaşin o totte itadake-mas ka?"},{"id":"sgh-3","categoryId":"sightseeing","situation":"Giriş Ücreti Ne Kadar?","type":"question","speaker":"traveler","isEssential":false,"japanese":"入場料はいくらですか？ 大人二枚お願いします。","romaji":"Nyuujouryou wa ikura desu ka? Otona nimai onegaishimasu.","turkish":"Giriş ücreti ne kadar? İki yetişkin bileti lütfen.","turkishPronunciation":"Nyuucoo-ryoo va ikura des ka? Otona nimay onegay-şimas."},{"id":"med-1","categoryId":"pharmacy_emergency","situation":"Baş Ağrısı / Ağrı Kesici İsteme","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"頭痛薬（痛み止め）はありますか？","romaji":"Zutsuuyaku (itamidome) wa arimasu ka?","turkish":"Baş ağrısı ilacı / Ağrı kesici var mı?","turkishPronunciation":"Zutsuu-yaku (itami-dome) va arimas ka?","culturalNotes":"Japon eczanelerinde (Drugstore) reçetesiz çok etkili ağrı kesiciler (EVE, Loxonin) bulunur."},{"id":"med-2","categoryId":"pharmacy_emergency","situation":"Mide / Karın Ağrısı Söyleme","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"お腹が痛いです。胃腸薬をください。","romaji":"Onaka ga itai desu. Ichouyaku o kudasai.","turkish":"Karnım/midem ağrıyor. Mide ilacı lütfen.","turkishPronunciation":"Onaka ga itay des. İçoo-yaku o kudasay."},{"id":"med-3","categoryId":"pharmacy_emergency","situation":"Pasaportumu Kaybettim / Polis Merkezi","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"パスポートを失くしました。交番はどこですか？","romaji":"Pasupooto o nakushimashita. Kouban wa doko desu ka?","turkish":"Pasaportumu kaybettim. Polis noktası (Kouban) nerede?","turkishPronunciation":"Pasupooto o nakuşi-maşta. Kooban va doko des ka?","culturalNotes":"Japonya'da neredeyse her sokak köşesinde \"KOUBAN\" adlı küçük polis kulübeleri bulunur."},{"id":"med-4","categoryId":"pharmacy_emergency","situation":"Ambulans Çağırın! (Acil 119)","type":"phrase","speaker":"traveler","isEssential":true,"japanese":"救急車を呼んでください！（緊急）","romaji":"Kyuukyuusha o yonde kudasai!","turkish":"Lütfen acil ambulans çağırın!","turkishPronunciation":"Kyuukyuu-şa o yonde kudasay!","culturalNotes":"Japonya'da Ambulans & İtfaiye numarası 119'dur."}]};
+  </script>
+
+  <!-- APP ENGINE LOGIC -->
+  <script>
+    // State
+    let activeTab = 'places';
+    let selectedCategory = 'general';
+    let searchQuery = '';
+    let favorites = JSON.parse(localStorage.getItem('nihongo_favs') || '[]');
+    let currentFlashcardIndex = 0;
+    let isFlipped = false;
+    let quizQuestions = [];
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let targetPhraseForModal = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordedBlob = null;
+    let isRecording = false;
+    let speechRecognition = null;
+    let transcriptText = '';
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderCategoryList();
+      renderCategoryContent();
+      updateFavoritesUI();
+      checkApiKeyNotice();
+
+      // Check API Key
+      const key = localStorage.getItem('gemini_api_key');
+      if (key) {
+        document.getElementById('gemini-api-key-input').value = key;
+        document.getElementById('api-key-badge-text').innerText = 'API Aktif';
+      }
+    });
+
+    function checkApiKeyNotice() {
+      const key = localStorage.getItem('gemini_api_key');
+      const notice = document.getElementById('api-key-notice');
+      if (key) {
+        notice.classList.add('hidden');
+      } else {
+        notice.classList.remove('hidden');
+      }
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      ['places', 'practice', 'etiquette', 'favorites'].forEach(t => {
+        document.getElementById('view-' + t).classList.toggle('hidden', t !== tab);
+        const deskBtn = document.getElementById('desk-tab-' + t);
+        if (deskBtn) {
+          deskBtn.className = t === tab 
+            ? 'px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 bg-[#1A1A1A] text-white shadow-md transition-all'
+            : 'px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 text-gray-600 hover:bg-gray-100 transition-all';
+        }
+        const mobBtn = document.getElementById('mob-tab-' + t);
+        if (mobBtn) {
+          mobBtn.className = t === tab
+            ? 'flex flex-col items-center justify-center py-1 text-[#E63946] font-black'
+            : 'flex flex-col items-center justify-center py-1 text-gray-500 font-semibold';
+        }
+      });
+
+      if (tab === 'practice') initPracticeView();
+      if (tab === 'etiquette') renderEtiquetteView();
+      if (tab === 'favorites') renderFavoritesView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderCategoryList() {
+      const container = document.getElementById('category-list');
+      container.innerHTML = APP_DATA.categories.map(cat => {
+        const isSel = cat.id === selectedCategory;
+        return `
+          <button 
+            onclick="selectCategory('${cat.id}')" 
+            class="px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap flex items-center gap-2 border transition-all shrink-0 ${
+              isSel ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] shadow-md scale-[1.02]' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+            }">
+            <span>${cat.name}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectCategory(catId) {
+      selectedCategory = catId;
+      renderCategoryList();
+      renderCategoryContent();
+    }
+
+    function renderCategoryContent() {
+      const cat = APP_DATA.categories.find(c => c.id === selectedCategory) || APP_DATA.categories[0];
+      const phrases = APP_DATA.phrases.filter(p => p.categoryId === cat.id);
+
+      // Banner
+      document.getElementById('cat-badge').innerText = cat.japaneseName;
+      document.getElementById('cat-title').innerText = cat.name;
+      document.getElementById('cat-desc').innerText = cat.tagline + ' - ' + cat.description;
+      document.getElementById('cat-count').innerText = phrases.length + ' İfade';
+
+      // Phrases
+      renderPhrases(phrases);
+    }
+
+    function renderPhrases(phrases) {
+      const grid = document.getElementById('phrases-grid');
+      if (phrases.length === 0) {
+        grid.innerHTML = '<div class="col-span-full p-8 text-center text-gray-400 font-bold text-sm bg-white rounded-3xl border border-gray-200">Aradığınız kriterde ifade bulunamadı.</div>';
+        return;
+      }
+
+      grid.innerHTML = phrases.map(p => {
+        const isFav = favorites.includes(p.id);
+        return `
+          <div class="p-5 rounded-3xl bg-white border border-gray-200 shadow-xs hover:shadow-md transition-all space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">${p.situation}</span>
+                <button onclick="toggleFavorite('${p.id}')" class="p-1.5 rounded-full hover:bg-amber-50 text-gray-300 hover:text-amber-500 transition-colors">
+                  <i data-lucide="bookmark" class="w-4 h-4 ${isFav ? 'text-amber-500 fill-amber-500' : ''}"></i>
+                </button>
+              </div>
+              <h3 class="text-xl font-black font-jp text-[#1A1A1A]">${p.japanese}</h3>
+              <p class="text-xs font-bold text-gray-400">${p.romaji}</p>
+              <p class="text-xs font-semibold text-[#E63946]">[${p.turkishPronunciation}]</p>
+              <p class="text-xs font-bold text-gray-800 border-t border-gray-100 pt-2">${p.turkish}</p>
+              ${p.culturalNotes ? `<p class="text-[11px] text-gray-500 font-medium italic">💡 ${p.culturalNotes}</p>` : ''}
+            </div>
+            
+            <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+              <button onclick="playAudio('${p.japanese.replace(/'/g, "\\'")}')" class="px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-[#E63946] text-xs font-black flex items-center gap-1.5 transition-colors">
+                <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> Dinle
+              </button>
+              <button onclick="openPronounceModal('${p.id}')" class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-black flex items-center gap-1.5 transition-colors">
+                <i data-lucide="mic" class="w-3.5 h-3.5 text-[#E63946]"></i> Telaffuz Et
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function handleSearch(q) {
+      searchQuery = q.toLowerCase().trim();
+      if (!searchQuery) {
+        renderCategoryContent();
+        return;
+      }
+      const filtered = APP_DATA.phrases.filter(p => 
+        p.japanese.toLowerCase().includes(searchQuery) ||
+        p.romaji.toLowerCase().includes(searchQuery) ||
+        p.turkish.toLowerCase().includes(searchQuery) ||
+        p.situation.toLowerCase().includes(searchQuery) ||
+        p.turkishPronunciation.toLowerCase().includes(searchQuery)
+      );
+      renderPhrases(filtered);
+    }
+
+    // Audio Playback
+    function playAudio(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'ja-JP';
+        utter.rate = 0.85;
+        window.speechSynthesis.speak(utter);
+      } else {
+        alert('Tarayıcınız ses sentezleme özelliğini desteklemiyor.');
+      }
+    }
+
+    // Favorites
+    function toggleFavorite(id) {
+      if (favorites.includes(id)) {
+        favorites = favorites.filter(f => f !== id);
+      } else {
+        favorites.push(id);
+      }
+      localStorage.setItem('nihongo_favs', JSON.stringify(favorites));
+      updateFavoritesUI();
+      if (activeTab === 'places') renderCategoryContent();
+      if (activeTab === 'favorites') renderFavoritesView();
+    }
+
+    function updateFavoritesUI() {
+      const count = favorites.length;
+      const deskCount = document.getElementById('desk-fav-count');
+      const mobCount = document.getElementById('mob-fav-count');
+      if (count > 0) {
+        deskCount.innerText = count; deskCount.classList.remove('hidden');
+        mobCount.innerText = count; mobCount.classList.remove('hidden');
+      } else {
+        deskCount.classList.add('hidden');
+        mobCount.classList.add('hidden');
+      }
+    }
+
+    function renderFavoritesView() {
+      const favPhrases = APP_DATA.phrases.filter(p => favorites.includes(p.id));
+      const grid = document.getElementById('favorites-grid');
+      if (favPhrases.length === 0) {
+        grid.innerHTML = '<div class="col-span-full p-8 text-center text-gray-400 font-bold text-sm">Henüz kaydedilmiş bir ifadeniz yok. Kartlardaki yer işareti simgesine tıklayarak favorilerinize ekleyebilirsiniz.</div>';
+        return;
+      }
+      grid.innerHTML = favPhrases.map(p => `
+        <div class="p-5 rounded-3xl bg-gray-50 border border-gray-200 space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-[10px] font-black uppercase text-gray-500">${p.situation}</span>
+            <button onclick="toggleFavorite('${p.id}')" class="text-amber-500"><i data-lucide="bookmark" class="w-4 h-4 fill-amber-500"></i></button>
+          </div>
+          <h3 class="text-xl font-black font-jp text-[#1A1A1A]">${p.japanese}</h3>
+          <p class="text-xs text-[#E63946] font-bold">[${p.turkishPronunciation}]</p>
+          <p class="text-xs font-bold text-gray-700">${p.turkish}</p>
+          <div class="flex gap-2 pt-2 border-t border-gray-200">
+            <button onclick="playAudio('${p.japanese.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-xl bg-red-50 text-[#E63946] text-xs font-black">Dinle</button>
+            <button onclick="openPronounceModal('${p.id}')" class="px-3 py-1.5 rounded-xl bg-gray-200 text-gray-800 text-xs font-black">Telaffuz Et</button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function clearAllFavorites() {
+      if (confirm('Tüm favorileri temizlemek istediğinize emin misiniz?')) {
+        favorites = [];
+        localStorage.setItem('nihongo_favs', JSON.stringify([]));
+        updateFavoritesUI();
+        renderFavoritesView();
+      }
+    }
+
+    // Flashcards & Quiz
+    function initPracticeView() {
+      currentFlashcardIndex = 0;
+      isFlipped = false;
+      renderCurrentFlashcard();
+    }
+
+    function setPracticeMode(mode) {
+      document.getElementById('subview-flashcard').classList.toggle('hidden', mode !== 'flashcard');
+      document.getElementById('subview-quiz').classList.toggle('hidden', mode !== 'quiz');
+      document.getElementById('p-mode-flash').className = mode === 'flashcard' 
+        ? 'px-4 py-2 rounded-xl text-xs font-black bg-white text-[#1A1A1A] shadow-xs' 
+        : 'px-4 py-2 rounded-xl text-xs font-black text-gray-600 hover:text-black';
+      document.getElementById('p-mode-quiz').className = mode === 'quiz' 
+        ? 'px-4 py-2 rounded-xl text-xs font-black bg-white text-[#1A1A1A] shadow-xs' 
+        : 'px-4 py-2 rounded-xl text-xs font-black text-gray-600 hover:text-black';
+
+      if (mode === 'quiz') startQuiz();
+    }
+
+    function renderCurrentFlashcard() {
+      const p = APP_DATA.phrases[currentFlashcardIndex];
+      const cat = APP_DATA.categories.find(c => c.id === p.categoryId);
+      document.getElementById('fc-category').innerText = (cat ? cat.name : '') + ' • ' + p.situation;
+      document.getElementById('fc-japanese').innerText = p.japanese;
+      document.getElementById('fc-romaji').innerText = p.romaji;
+      document.getElementById('fc-phonetic').innerText = '[' + p.turkishPronunciation + ']';
+      document.getElementById('fc-turkish').innerText = p.turkish;
+      document.getElementById('fc-notes').innerText = p.culturalNotes ? '💡 ' + p.culturalNotes : '';
+      
+      document.getElementById('fc-front').classList.toggle('hidden', isFlipped);
+      document.getElementById('fc-back').classList.toggle('hidden', !isFlipped);
+    }
+
+    function flipFlashcard() {
+      isFlipped = !isFlipped;
+      document.getElementById('fc-front').classList.toggle('hidden', isFlipped);
+      document.getElementById('fc-back').classList.toggle('hidden', !isFlipped);
+    }
+
+    function nextFlashcard() {
+      isFlipped = false;
+      currentFlashcardIndex = (currentFlashcardIndex + 1) % APP_DATA.phrases.length;
+      renderCurrentFlashcard();
+    }
+
+    function prevFlashcard() {
+      isFlipped = false;
+      currentFlashcardIndex = (currentFlashcardIndex - 1 + APP_DATA.phrases.length) % APP_DATA.phrases.length;
+      renderCurrentFlashcard();
+    }
+
+    function playCurrentFlashcardAudio(e) {
+      e.stopPropagation();
+      playAudio(APP_DATA.phrases[currentFlashcardIndex].japanese);
+    }
+
+    // Quiz Logic
+    function startQuiz() {
+      quizQuestions = [...APP_DATA.phrases].sort(() => Math.random() - 0.5).slice(0, 10);
+      currentQuizIndex = 0;
+      quizScore = 0;
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+      if (currentQuizIndex >= quizQuestions.length) {
+        document.getElementById('subview-quiz').innerHTML = `
+          <div class="p-8 text-center space-y-4 bg-gray-50 rounded-3xl border border-gray-200">
+            <h3 class="text-2xl font-black text-[#1A1A1A]">Tebrikler! Test Tamamlandı 🎉</h3>
+            <p class="text-base font-bold text-[#E63946]">Toplam Skor: ${quizScore} / ${quizQuestions.length * 10}</p>
+            <button onclick="startQuiz()" class="px-6 py-3 rounded-2xl bg-[#1A1A1A] text-white text-xs font-black">Yeniden Başlat</button>
+          </div>
+        `;
+        return;
+      }
+
+      const q = quizQuestions[currentQuizIndex];
+      document.getElementById('quiz-progress').innerText = `Soru ${currentQuizIndex + 1} / ${quizQuestions.length}`;
+      document.getElementById('quiz-score').innerText = `Skor: ${quizScore}`;
+      document.getElementById('quiz-cat-name').innerText = q.situation;
+      document.getElementById('quiz-question').innerText = q.japanese;
+      document.getElementById('quiz-romaji').innerText = q.romaji + ' [' + q.turkishPronunciation + ']';
+
+      // Generate 4 options
+      const otherOptions = APP_DATA.phrases.filter(p => p.id !== q.id).sort(() => Math.random() - 0.5).slice(0, 3).map(p => p.turkish);
+      const allOptions = [q.turkish, ...otherOptions].sort(() => Math.random() - 0.5);
+
+      document.getElementById('quiz-options').innerHTML = allOptions.map(opt => `
+        <button onclick="handleQuizAnswer(this, '${opt.replace(/'/g, "\\'")}', '${q.turkish.replace(/'/g, "\\'")}')" class="w-full p-4 text-left rounded-2xl bg-white border border-gray-200 hover:border-gray-400 font-bold text-xs sm:text-sm text-[#1A1A1A] transition-all">
+          ${opt}
+        </button>
+      `).join('');
+    }
+
+    function handleQuizAnswer(btn, selected, correct) {
+      const isCorrect = selected === correct;
+      if (isCorrect) {
+        btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
+        quizScore += 10;
+      } else {
+        btn.classList.add('bg-red-500', 'text-white', 'border-red-600');
+      }
+      setTimeout(() => {
+        currentQuizIndex++;
+        renderQuizQuestion();
+      }, 700);
+    }
+
+    // Etiquette
+    function renderEtiquetteView() {
+      const allTips = [];
+      APP_DATA.categories.forEach(cat => {
+        cat.etiquetteTips.forEach(tip => {
+          allTips.push({ catName: cat.name, tip });
+        });
+      });
+      document.getElementById('etiquette-grid').innerHTML = allTips.map((item) => `
+        <div class="p-5 rounded-3xl bg-gray-50 border border-gray-200 space-y-2">
+          <span class="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-full">${item.catName}</span>
+          <p class="text-xs sm:text-sm font-semibold text-gray-800 leading-relaxed">${item.tip}</p>
+        </div>
+      `).join('');
+    }
+
+    // API Key Modal
+    function openApiKeyModal() {
+      document.getElementById('modal-api-key').classList.remove('hidden');
+      document.getElementById('modal-api-key').classList.add('flex');
+      lucide.createIcons();
+    }
+    function closeApiKeyModal() {
+      document.getElementById('modal-api-key').classList.add('hidden');
+      document.getElementById('modal-api-key').classList.remove('flex');
+    }
+    function saveApiKey() {
+      const val = document.getElementById('gemini-api-key-input').value.trim();
+      if (val) {
+        localStorage.setItem('gemini_api_key', val);
+        document.getElementById('api-key-badge-text').innerText = 'API Aktif';
+        alert('Gemini API anahtarınız başarıyla kaydedildi.');
+      } else {
+        localStorage.removeItem('gemini_api_key');
+        document.getElementById('api-key-badge-text').innerText = 'API Anahtarı';
+      }
+      checkApiKeyNotice();
+      closeApiKeyModal();
+    }
+
+    // Pronunciation Modal & Gemini AI
+    function openPronounceModal(phraseId) {
+      const phrase = APP_DATA.phrases.find(p => p.id === phraseId);
+      if (!phrase) return;
+      targetPhraseForModal = phrase;
+
+      const cat = APP_DATA.categories.find(c => c.id === phrase.categoryId);
+      document.getElementById('modal-pr-cat').innerText = (cat ? cat.name : '') + ' • ' + phrase.situation;
+      document.getElementById('modal-pr-jp').innerText = phrase.japanese;
+      document.getElementById('modal-pr-romaji').innerText = phrase.romaji;
+      document.getElementById('modal-pr-phonetic').innerText = '[' + phrase.turkishPronunciation + ']';
+      document.getElementById('modal-pr-tr').innerText = phrase.turkish;
+
+      // Reset
+      document.getElementById('audio-preview-box').classList.add('hidden');
+      document.getElementById('evaluation-result-box').classList.add('hidden');
+      document.getElementById('record-status-text').innerText = 'Mikrofona basın ve Japonca cümleyi söyleyin';
+
+      document.getElementById('modal-pronounce').classList.remove('hidden');
+      document.getElementById('modal-pronounce').classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closePronounceModal() {
+      if (isRecording) stopRecording();
+      document.getElementById('modal-pronounce').classList.add('hidden');
+      document.getElementById('modal-pronounce').classList.remove('flex');
+    }
+
+    async function toggleRecording() {
+      if (isRecording) {
+        stopRecording();
+      } else {
+        await startRecording();
+      }
+    }
+
+    async function startRecording() {
+      audioChunks = [];
+      transcriptText = '';
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+        mediaRecorder.onstop = () => {
+          recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(recordedBlob);
+          const audioEl = document.getElementById('recorded-audio');
+          audioEl.src = audioUrl;
+          document.getElementById('audio-preview-box').classList.remove('hidden');
+          stream.getTracks().forEach(t => t.stop());
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        document.getElementById('btn-record-mic').classList.add('bg-red-700', 'animate-pulse');
+        document.getElementById('record-status-text').innerText = '🎙️ Dinleniyor... Konuşmanızı tamamlayınca tekrar basın.';
+
+        // Web Speech Recognition for fallback/transcript
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRec) {
+          speechRecognition = new SpeechRec();
+          speechRecognition.lang = 'ja-JP';
+          speechRecognition.onresult = (e) => {
+            transcriptText = e.results[0][0].transcript;
+          };
+          speechRecognition.start();
+        }
+      } catch (err) {
+        alert('Mikrofon erişimi sağlanamadı. Lütfen tarayıcı izinlerini kontrol edin.');
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        document.getElementById('btn-record-mic').classList.remove('bg-red-700', 'animate-pulse');
+        document.getElementById('record-status-text').innerText = '✅ Ses kaydınız alındı. Dinleyebilir veya analiz ettirebilirsiniz.';
+        if (speechRecognition) {
+          try { speechRecognition.stop(); } catch(e){}
+        }
+      }
+    }
+
+    async function analyzePronunciationWithGemini() {
+      const apiKey = localStorage.getItem('gemini_api_key');
+      if (!apiKey) {
+        alert('AI Telaffuz Değerlendirmesi için lütfen sağ üstteki butondan Google Gemini API anahtarınızı girin.');
+        openApiKeyModal();
+        return;
+      }
+
+      const btn = document.getElementById('btn-ai-analyze');
+      btn.innerText = '⏳ Yapay Zeka İnceliyor...';
+      btn.disabled = true;
+
+      try {
+        const prompt = "Sen Türk gezginlere Japonca öğreten uzman bir fonetik ve telaffuz koçusun.\n" +
+          "Hedef Japonca İfade: \"" + targetPhraseForModal.japanese + "\" (Romaji: " + targetPhraseForModal.romaji + ", Türkçe Okunuş: " + targetPhraseForModal.turkishPronunciation + ").\n" +
+          "Kullanıcının Konuşma Tanıma Sonucu (Duyulan Metin): \"" + (transcriptText || 'Sesli kayıt alındı') + "\".\n\n" +
+          "Lütfen telaffuzu nesnel olarak değerlendir ve aşağıdaki JSON formatında yanıt ver:\n" +
+          "{\n" +
+          '  "overallScore": 85,\n' +
+          '  "detectedText": "Duyulan metin veya Romaji",\n' +
+          '  "accuracy": 85,\n' +
+          '  "fluency": 80,\n' +
+          '  "clarity": 90,\n' +
+          '  "summaryFeedback": "Türkçe anlaşılır geri bildirim",\n' +
+          '  "strengths": ["Güçlü yön 1"],\n' +
+          '  "mistakes": ["Geliştirilecek hece"],\n' +
+          '  "phoneticTips": ["Türkçe konuşanlar için özel ipucu"],\n' +
+          '  "encouragement": "Motive edici Japonca tebrik"\n' +
+          "}\n" +
+          "SADECE GEÇERLİ JSON DÖNDÜR.";
+
+        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json' }
+          })
+        });
+
+        const resData = await response.json();
+        const text = resData.candidates[0].content.parts[0].text;
+        const result = JSON.parse(text);
+
+        const resBox = document.getElementById('evaluation-result-box');
+        resBox.classList.remove('hidden');
+        resBox.innerHTML = `
+          <div class="flex items-center justify-between pb-2 border-b border-emerald-200">
+            <span class="text-xs font-black uppercase text-emerald-800">Telaffuz Skoru</span>
+            <span class="text-2xl font-black text-emerald-700">%${result.overallScore}</span>
+          </div>
+          ${result.detectedText ? `<p class="text-xs font-bold text-gray-700">Duyulan: "${result.detectedText}"</p>` : ''}
+          <p class="text-xs text-gray-800 font-semibold leading-relaxed">💬 ${result.summaryFeedback}</p>
+          ${result.phoneticTips && result.phoneticTips.length > 0 ? `
+            <div class="p-3 rounded-xl bg-white text-xs font-medium text-gray-700 border border-emerald-100">
+              <strong>💡 Fonetik İpucu:</strong> ${result.phoneticTips.join(', ')}
+            </div>
+          ` : ''}
+          <p class="text-xs font-black text-emerald-900">🌸 ${result.encouragement}</p>
+        `;
+      } catch (err) {
+        alert('AI değerlendirmesi sırasında bir hata oluştu. API anahtarınızı kontrol edin.');
+      } finally {
+        btn.innerText = 'AI ile Telaffuzumu Değerlendir';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

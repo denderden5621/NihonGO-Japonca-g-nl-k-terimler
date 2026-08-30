@@ -1,0 +1,19 @@
+{
+  "name": "nihongotr-apk",
+  "version": "1.0.0",
+  "description": "NihongoTR Japonya Seyahat Rehberi Android / APK Build Yapılandırması",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android",
+    "apk:build": "npm run build && cap sync && cd android && ./gradlew assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0"
+  }
+}

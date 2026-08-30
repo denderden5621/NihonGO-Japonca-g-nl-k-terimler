@@ -1,0 +1,6 @@
+{
+  "name": "Japonya Seyahat Rehberi",
+  "description": "Japonya seyahatiniz için konbini, restoran, mağaza ve genel durumlarda temel Japonca ifadeler, sesli telaffuz ve yapay zeka telaffuz değerlendirme rehberi.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

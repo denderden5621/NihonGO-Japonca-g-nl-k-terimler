@@ -1,0 +1,17 @@
+{
+  "appId": "com.nihongotr.travelapp",
+  "appName": "NihongoTR",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#FFFFFF",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#FFFFFF"
+    }
+  }
+}
